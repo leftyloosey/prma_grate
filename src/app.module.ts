@@ -3,15 +3,20 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { CommentsModule } from './comments/comments.module';
-import { MongooseModule } from '@nestjs/mongoose';
+// import { PrismaModule } from 'nestjs-prisma';
+
+// import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   imports: [
     UsersModule,
     CommentsModule,
-    MongooseModule.forRoot(
-      'mongodb+srv://lefty:lefty@cluster0.fpuucsj.mongodb.net/nestmigrate',
-    ),
+    // PrismaModule.forRoot({
+    //   isGlobal: true,
+    // }),
+    // MongooseModule.forRoot(
+    //   'mongodb+srv://lefty:lefty@cluster0.fpuucsj.mongodb.net/nestmigrate',
+    // ),
   ],
   controllers: [AppController],
   providers: [AppService],

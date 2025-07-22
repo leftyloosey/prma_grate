@@ -1,50 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { CreateCommentDto } from './dto/create-comment.dto';
+import { PrismaService } from '../prisma.service';
+
 // import { UpdateCommentDto } from './dto/update-comment.dto';
-import { Comment } from './schemas/comment.schema';
-import { Model } from 'mongoose';
-import { InjectModel } from '@nestjs/mongoose';
+
 @Injectable()
 export class CommentsService {
-  constructor(
-    @InjectModel(Comment.name) private commentModel: Model<Comment>,
-  ) {}
-  create(createCommentDto: CreateCommentDto) {
-    const createdComment = this.commentModel.create({
-      text: createCommentDto.text,
-      parent: createCommentDto.parentId || null,
-      user: createCommentDto.userId,
-    });
-    return createdComment.then((doc) => {
-      return doc.populate(['user', 'parent']);
-    });
-  }
+  constructor(private prisma: PrismaService) {}
 
   findAll() {
-    return this.commentModel.find().populate(['user', 'parent']).exec();
+    return this.prisma.comments.findMany();
   }
-  getTopLevelComments() {
-    return this.commentModel
-      .find({ parent: null })
-      .populate(['user', 'parent'])
-      .exec();
-  }
-  getCommentsByParentId(parentId: string) {
-    return this.commentModel
-      .find({ parent: parentId })
-      .populate(['user', 'parent'])
-      .exec();
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} comment`;
-  }
-
-  // update(id: number, updateCommentDto: UpdateCommentDto) {
-  //   return `This action updates a #${id} comment`;
+  // user(userId: string) {
+  //   return this.prisma.uses.findUnique({
+  //     where: { id: userId },
+  //   });
   // }
-
-  remove(id: number) {
-    return `This action removes a #${id} comment`;
+  create(createCommentDto: CreateCommentDto) {
+    const comment = this.prisma.comments.create({
+      data: {
+        text: createCommentDto.text,
+        usersId: createCommentDto.user,
+      },
+    });
+    return comment;
   }
 }

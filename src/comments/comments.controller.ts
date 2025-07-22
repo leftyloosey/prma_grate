@@ -5,8 +5,8 @@ import {
   Post,
   Body,
   // Patch,
-  Param,
-  Delete,
+  // Param,
+  // Delete,
   Query,
   BadRequestException,
 } from '@nestjs/common';
@@ -23,13 +23,14 @@ export class CommentsController {
     return this.commentsService.create(createCommentDto);
   }
 
-  @Get()
+  @Get('/params')
   findAll(@Query() queryParams) {
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (queryParams.parentId)
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        return this.commentsService.getCommentsByParentId(queryParams.parentId);
+        // return this.commentsService.getCommentsByParentId(queryParams.parentId);
+        return;
     } catch (error) {
       throw new BadRequestException('Something bad happened', {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -38,23 +39,23 @@ export class CommentsController {
       });
     }
   }
-  @Get('/top')
+  @Get('')
   findTopLevel() {
-    return this.commentsService.getTopLevelComments();
+    return this.commentsService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.commentsService.findOne(+id);
-  }
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.commentsService.findOne(+id);
+  // }
 
   // @Patch(':id')
   // update(@Param('id') id: string, @Body() updateCommentDto: UpdateCommentDto) {
   //   return this.commentsService.update(+id, updateCommentDto);
   // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.commentsService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.commentsService.remove(+id);
+  // }
 }

@@ -1,22 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './schemas/user.schema';
-import { Model } from 'mongoose';
-import { InjectModel } from '@nestjs/mongoose';
+// import { UpdateUserDto } from './dto/update-user.dto';
+import { PrismaService } from '../prisma.service';
+
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(private prisma: PrismaService) {}
+
   create(createUserDto: CreateUserDto) {
-    const savedUser = new this.userModel(createUserDto);
-    // const savedUser = new this.userModel({ name: 'Frodo Baggings' });
-    return savedUser.save();
-    // return 'This action adds a new user';
+    const user = this.prisma.users.create({
+      data: {
+        name: createUserDto.name,
+      },
+    });
+    return user;
   }
 
   findAll() {
-    return this.userModel.find().exec();
+    return this.prisma.users.findMany();
   }
+  // findAll() {
+  //   return this.userModel.find().exec();
+  // }
   returnHey() {
     return 'Hey!';
   }
@@ -25,9 +30,9 @@ export class UsersService {
     return `This action returns a #${id} user`;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
+  // update(id: number, updateUserDto: UpdateUserDto) {
+  //   return `This action updates a #${id} user`;
+  // }
 
   remove(id: number) {
     return `This action removes a #${id} user`;
