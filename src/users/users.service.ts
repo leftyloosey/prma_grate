@@ -11,6 +11,7 @@ export class UsersService {
     const user = this.prisma.users.create({
       data: {
         name: createUserDto.name,
+        password: createUserDto.password,
       },
     });
     return user;
