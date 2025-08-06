@@ -2,8 +2,8 @@ import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateCommentDto {
   parentId: null | string;
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
   text: string;
 
   @IsString()
