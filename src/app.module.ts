@@ -6,11 +6,13 @@ import { CommentsModule } from './comments/comments.module';
 // import { PrismaModule } from 'nestjs-prisma';
 
 // import { MongooseModule } from '@nestjs/mongoose';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
     UsersModule,
     CommentsModule,
+    AuthModule,
     // PrismaModule.forRoot({
     //   isGlobal: true,
     // }),

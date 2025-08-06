@@ -1,61 +1,41 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  // Patch,
-  // Param,
-  // Delete,
-  Query,
-  BadRequestException,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
-// import { UpdateCommentDto } from './dto/update-comment.dto';
 
 @Controller('comments')
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
-  @Post()
-  create(@Body() createCommentDto: CreateCommentDto) {
-    return this.commentsService.create(createCommentDto);
-  }
-
-  @Get('/params')
-  findAll(@Query() queryParams) {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      if (queryParams.parentId)
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        // return this.commentsService.getCommentsByParentId(queryParams.parentId);
-        return;
-    } catch (error) {
-      throw new BadRequestException('Something bad happened', {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        cause: new Error(error.message),
-        description: 'Some error description',
-      });
-    }
+  @Get('/withuser')
+  findAllWithUser() {
+    return this.commentsService.getAllWithUser();
   }
   @Get('')
-  findTopLevel() {
-    return this.commentsService.findAll();
+  findTopWithUser() {
+    return this.commentsService.getTopLevelWithUser();
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.commentsService.findOne(+id);
-  // }
+  @Get(':id')
+  findAllOneUser(@Param('id') id: string) {
+    return this.commentsService.getCommentsByParentId(id);
+  }
+  @Get('user/:id')
+  findProfileComments(@Param('id') id: string) {
+    return this.commentsService.getCommentsByUser(id);
+  }
+
+  @Post()
+  createComment(@Body() createCommentDto: CreateCommentDto) {
+    return this.commentsService.createComment(createCommentDto);
+  }
+
+  @Delete('delete/:id')
+  remove(@Param('id') id: string) {
+    return this.commentsService.deleteComment(id);
+  }
 
   // @Patch(':id')
   // update(@Param('id') id: string, @Body() updateCommentDto: UpdateCommentDto) {
   //   return this.commentsService.update(+id, updateCommentDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.commentsService.remove(+id);
   // }
 }

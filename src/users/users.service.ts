@@ -7,7 +7,7 @@ import { PrismaService } from '../prisma.service';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  create(createUserDto: CreateUserDto) {
+  createUser(createUserDto: CreateUserDto) {
     const user = this.prisma.users.create({
       data: {
         name: createUserDto.name,
@@ -17,19 +17,26 @@ export class UsersService {
     return user;
   }
 
-  findAll() {
+  getAllUsers() {
     return this.prisma.users.findMany();
   }
-  // findAll() {
-  //   return this.userModel.find().exec();
-  // }
-  returnHey() {
-    return 'Hey!';
+  getUserComments(id: string) {
+    return this.prisma.users.findUnique({
+      where: { id: id },
+      include: {
+        comments: true,
+      },
+    });
+  }
+  getUserForAuth(name: string, password: string) {
+    return this.prisma.users.findUnique({
+      where: { name: name, password: password },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
+  // findOne(id: number) {
+  //   return `This action returns a #${id} user`;
+  // }
 
   // update(id: number, updateUserDto: UpdateUserDto) {
   //   return `This action updates a #${id} user`;
