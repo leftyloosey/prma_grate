@@ -1,0 +1,11 @@
+{
+  "version": "1.0",
+  "apis": [
+    {
+      "identifier": "lingvanex",
+      "source": "@lingvanex/v1.0#1b6pqzql440wo5m",
+      "integrity": "sha512-1d7SI3E/oIMx2I1tF92EjokSfQANkMEApiuKmnYnzIceUKI5Ruj8+XpLghlmVHcTkv9VPzq+FRG1zzR0c/azfQ==",
+      "installerVersion": "6.1.3"
+    }
+  ]
+}

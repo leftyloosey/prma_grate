@@ -25,3 +25,9 @@ model users {
   password String
   comments comments[]
 }
+
+model words {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  original    String @unique
+  translation String
+}

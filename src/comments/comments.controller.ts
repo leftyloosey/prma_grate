@@ -14,6 +14,10 @@ export class CommentsController {
   findTopWithUser() {
     return this.commentsService.getTopLevelWithUser();
   }
+  @Get('/just')
+  justGetAll() {
+    return this.commentsService.getAllComments();
+  }
 
   @Get(':id')
   findAllOneUser(@Param('id') id: string) {

@@ -1,0 +1,374 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "description": "Lingvanex works via HTTPS requests. The URL of all requests starts with https://api-b2b.backenster.com/b1/api/v3/. In case of a protocol selection error and using HTTP, the request will be redirected to the address with the HTTPS protocol (status code 302). <br><br>Authentication of requests is done by adding the “Authorization” header with the following data format: Bearer The key can be created on the user control panel page https://lingvanex.com/account.\nExample: \"Authorization: Bearer <YOUR_API_KEY>\".",
+    "version": "1.0.0",
+    "title": "Lingvanex Cloud API",
+    "termsOfService": "https://lingvanex.com/terms-of-service/",
+    "contact": {
+      "email": "info@lingvanex.com"
+    }
+  },
+  "security": [
+    {
+      "APIKeyHeader": []
+    }
+  ],
+  "paths": {
+    "/getLanguages": {
+      "get": {
+        "tags": [
+          "Get languages"
+        ],
+        "summary": "Getting the list of languages",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "platform",
+            "description": "api",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "api"
+            }
+          },
+          {
+            "in": "query",
+            "name": "code",
+            "description": "the language code in the format “language code_code of the country”, which is used to display the names of the languages. The language code is represented only in lowercase letters, the country code only in uppercase letters (example en_GB, es_ES, ru_RU etc). If this option is not present, then English is used by default",
+            "schema": {
+              "type": "string",
+              "default": "en_GB"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "err": {
+                      "type": "string",
+                      "description": "the text of the error. It is null if the response status is 200. Otherwise, it contains a string",
+                      "example": null
+                    },
+                    "result": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "full_code": {
+                            "type": "string",
+                            "description": "the language code in the format “language code_code of the country”"
+                          },
+                          "code_alpha_1": {
+                            "type": "string",
+                            "description": "the language code in the “language code” format"
+                          },
+                          "englishName": {
+                            "type": "string",
+                            "description": "English name of the language"
+                          },
+                          "codeName": {
+                            "type": "string",
+                            "description": "the language name translated using the language specified by the query parameter “code”"
+                          },
+                          "flagPath": {
+                            "type": "string",
+                            "description": "the relative address of which is the image of the country flag. Example static/flags/afrikaans. The full address for downloading the flag will be https://backenster.com/v2/static/flags/afrikaans.png. In order to download flags in increased resolutions, you should add to this parameter: @2x or @3x (example https://backenster.com/v2/static/flags/afrikaans@2x.png or  https://backenster.com/v2/static/flags/afrikaans@3x.png)"
+                          },
+                          "testWordForSyntezis": {
+                            "type": "string",
+                            "description": "a word for testing a speech synthesizer"
+                          },
+                          "modes": {
+                            "type": "array",
+                            "description": "an array of objects, each of which is a description of the function that is supported in the given language",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "name": {
+                                  "type": "string",
+                                  "description": "name of the function. Currently, only 4 functions are widely supported: “Speech synthesis“, “Image recognition“, “Translation“, “Speech recognition“"
+                                },
+                                "value": {
+                                  "type": "boolean",
+                                  "description": "logical value true or false, which shows the status of the function: on or off"
+                                },
+                                "genders": {
+                                  "type": "boolean",
+                                  "description": "logical value true or false, which shows the ability to synthesize speech for both sexes. Displayed only for function “Speech synthesis“"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "example": [
+                        {
+                          "full_code": "en_GB",
+                          "name": "en",
+                          "englishName": "Afrikaans",
+                          "codeName": "Afrikaans",
+                          "flagPath": "static/flags/afrikaans",
+                          "testWordForSyntezis": "Hallo",
+                          "modes": [
+                            {
+                              "name": "Translation",
+                              "value": true,
+                              "genders": true
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authorization error. You should add the API_KEY to request which can be created on the user control panel page https://lingvanex.com/account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "err": {
+                      "type": "string",
+                      "description": "the text of the error. It is null if the response status is 200. Otherwise, it contains a string"
+                    }
+                  },
+                  "example": {
+                    "err": "Token absent"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/translate": {
+      "post": {
+        "tags": [
+          "Translate (text, HTML, transliterate, auto detection)"
+        ],
+        "summary": "Translate",
+        "description": "This method translates text and HTML single string or arrays. Also it performs transliteration, language auto detection. Please, check request examples on the right to check these capabilities.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "to",
+                  "data",
+                  "platform"
+                ],
+                "properties": {
+                  "from": {
+                    "type": "string",
+                    "description": "the language code in the format “language code_code of the country” from which the text is translated. The language code is represented only in lowercase letters, the country code only in uppercase letters (example en_GB, es_ES, ru_RU and etc.). If this parameter is not present, the auto-detect language mode is enabled"
+                  },
+                  "to": {
+                    "type": "string",
+                    "description": "language code in the format “language code_code of the country” to which the text is translated (required)"
+                  },
+                  "data": {
+                    "oneOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    ],
+                    "description": "data for translation"
+                  },
+                  "translateMode": {
+                    "type": "string",
+                    "enum": [
+                      "html"
+                    ],
+                    "description": "Describe the input text format. Possible value is \"html\" for  translating and preserving html structure. If value is not  specified or is other than \"html\" than plain text is translating.  "
+                  },
+                  "enableTransliteration": {
+                    "type": "boolean",
+                    "description": "If true response includes sourceTransliteration and targetTransliteration fields.\n          platform:"
+                  },
+                  "platform": {
+                    "type": "string",
+                    "description": "api",
+                    "default": "api"
+                  }
+                }
+              },
+              "examples": {
+                "Translate text": {
+                  "value": {
+                    "from": "en_GB",
+                    "to": "de_DE",
+                    "data": "London is the capital and largest city of England and of the United Kingdom.",
+                    "platform": "api"
+                  }
+                },
+                "Translate text array": {
+                  "value": {
+                    "from": "en_GB",
+                    "to": "de_DE",
+                    "data": [
+                      "London is the capital and largest city of England and of the United Kingdom.",
+                      "Hello World!"
+                    ],
+                    "platform": "api"
+                  }
+                },
+                "Translate and transliterate text": {
+                  "value": {
+                    "from": "en_GB",
+                    "to": "de_DE",
+                    "data": "London is the capital and largest city of England and of the United Kingdom.                  ",
+                    "platform": "api",
+                    "enableTransliteration": true
+                  }
+                },
+                "Translate text and auto detect language": {
+                  "value": {
+                    "to": "de_DE",
+                    "data": "London is the capital and largest city of England and of the United Kingdom.",
+                    "platform": "api"
+                  }
+                },
+                "Translate html": {
+                  "value": {
+                    "from": "en_GB",
+                    "to": "de_DE",
+                    "translateMode": "html",
+                    "data": "<h1>London is the capital and largest city of England and of the United Kingdom.</h1>",
+                    "platform": "api"
+                  }
+                },
+                "Translate html array": {
+                  "value": {
+                    "from": "en_GB",
+                    "to": "de_DE",
+                    "translateMode": "html",
+                    "data": [
+                      "<h1>London is the capital and largest city of England and of the United Kingdom.</h1>",
+                      "<h1>Hello World!</h1>"
+                    ],
+                    "platform": "api"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "err",
+                    "result"
+                  ],
+                  "properties": {
+                    "err": {
+                      "type": "string",
+                      "description": "the text of the error. It is null if the response status is 200. Otherwise, it contains a string"
+                    },
+                    "result": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      ],
+                      "description": "result of translation. In the event that a line was sent to the translation, the result is also a string; if an array of strings, then we also get an array of strings"
+                    },
+                    "sourceTransliteration": {
+                      "type": "string",
+                      "description": "return only if enableTransliteration request param is true. Transliteration of source data. In the event that a line was sent to the translation, the result is also a string; if an array of strings, then we also get an array of strings"
+                    },
+                    "targetTransliteration": {
+                      "type": "string",
+                      "description": "return only if enableTransliteration request param is true. Transliteration results. In the event that a line was sent to the translation, the result is also a string; if an array of strings, then we also get an array of strings"
+                    }
+                  },
+                  "example": {
+                    "err": null,
+                    "result": "London ist die Hauptstadt und größte Stadt Englands und des Vereinigten Königreichs.",
+                    "sourceTransliteration": "London is the capital and largest city of England and of the United Kingdom.",
+                    "targetTransliteration": "London ist die Hauptstadt und grosste Stadt Englands und des Vereinigten Konigreichs."
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authorization error. You should add the API_KEY to request which can be created on the user control panel page https://lingvanex.com/account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "err": {
+                      "type": "string",
+                      "description": "the text of the error. It is null if the response status is 200. Otherwise, it contains a string"
+                    }
+                  },
+                  "example": {
+                    "err": "Token absent"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api-b2b.backenster.com/b1/api/v3"
+    },
+    {
+      "url": "http://api-b2b.backenster.com/b1/api/v3"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "APIKeyHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization"
+      }
+    },
+    "schemas": {
+      "AuthError": {
+        "properties": {
+          "err": {
+            "type": "string",
+            "description": "the text of the error. It is null if the response status is 200. Otherwise, it contains a string"
+          }
+        },
+        "example": {
+          "err": "Token absent"
+        }
+      }
+    }
+  }
+}
