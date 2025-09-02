@@ -24,6 +24,11 @@ export class TranslateController {
     return this.translateService.submitWord(createTranslateDto);
     // return this.translateService.submitWord(createTranslateDto);
   }
+  @Post('/scrape')
+  submitScrape(@Body() createTranslateDto: CreateTranslateDto) {
+    return this.translateService.scrape(createTranslateDto);
+    // return this.translateService.submitWord(createTranslateDto);
+  }
 
   // @Get(':id')
   // findOne(@Param('id') id: string) {

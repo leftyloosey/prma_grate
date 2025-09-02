@@ -8,6 +8,7 @@ import { CommentsModule } from './comments/comments.module';
 // import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { TranslateModule } from './translate/translate.module';
+import { ScrapeModule } from './scrape/scrape.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { TranslateModule } from './translate/translate.module';
     CommentsModule,
     AuthModule,
     TranslateModule,
+    ScrapeModule,
     // PrismaModule.forRoot({
     //   isGlobal: true,
     // }),
