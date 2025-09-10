@@ -8,22 +8,9 @@ import { CommentsModule } from './comments/comments.module';
 // import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { TranslateModule } from './translate/translate.module';
-import { ScrapeModule } from './scrape/scrape.module';
 
 @Module({
-  imports: [
-    UsersModule,
-    CommentsModule,
-    AuthModule,
-    TranslateModule,
-    ScrapeModule,
-    // PrismaModule.forRoot({
-    //   isGlobal: true,
-    // }),
-    // MongooseModule.forRoot(
-    //   'mongodb+srv://lefty:lefty@cluster0.fpuucsj.mongodb.net/nestmigrate',
-    // ),
-  ],
+  imports: [UsersModule, CommentsModule, AuthModule, TranslateModule],
   controllers: [AppController],
   providers: [AppService],
 })

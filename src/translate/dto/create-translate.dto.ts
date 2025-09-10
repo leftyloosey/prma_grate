@@ -12,24 +12,10 @@ export class CreateDoubleDto {
   @IsNotEmpty()
   @IsString()
   translation: string;
-}
-// export interface wok {
-//   batchcomplete: string;
-//   warnings: { extracts: '' };
-//   query: { pages: '' };
-//   // query: { pages: { 1600167: { extract: '' } } };
-// }
-
-export interface extract {
-  extract: object;
-}
-// export interface wok2 {
-//   batchcomplete: string;
-//   warnings: { extracts: '' };
-//   query: { pages: extract };
-// }
-export interface wok {
-  batchcomplete: string;
-  warnings: { extracts: '' };
-  query: { pages: extract };
+  @IsNotEmpty()
+  @IsString()
+  partOfSpeech: string;
+  examples: string[];
+  definitions: string[];
+  case: string;
 }

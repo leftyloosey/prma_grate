@@ -27,7 +27,12 @@ model users {
 }
 
 model words {
-  id          String @id @default(auto()) @map("_id") @db.ObjectId
-  original    String @unique
-  translation String
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  original     String   @unique
+  translation  String
+  partOfSpeech String
+  examples     String[]
+  definitions  String[]
+  case         Json
+  timestamp    DateTime
 }
