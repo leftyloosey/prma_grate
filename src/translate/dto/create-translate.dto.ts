@@ -1,9 +1,21 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateTranslateDto {
   @IsNotEmpty()
   @IsString()
   text: string;
+}
+export class CursorDto {
+  @IsString()
+  original: string;
+}
+export class OffsetDto {
+  @IsNumber()
+  page: number;
+}
+export class AheadDto {
+  @IsString()
+  ahead: string;
 }
 export class CreateDoubleDto {
   @IsNotEmpty()

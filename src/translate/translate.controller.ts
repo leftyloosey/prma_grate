@@ -1,7 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { TranslateService } from './translate.service';
-import { CreateTranslateDto } from './dto/create-translate.dto';
+import {
+  AheadDto,
+  CreateTranslateDto,
+  OffsetDto,
+} from './dto/create-translate.dto';
 import { CreateDoubleDto } from './dto/create-translate.dto';
 import { UpdateTranslateDto } from './dto/update-translate.dto';
 
@@ -18,6 +22,18 @@ export class TranslateController {
   getAllWords() {
     return this.translateService.getAllWords();
   }
+  @Get('/firstfifty')
+  getFirstFiftyWords() {
+    return this.translateService.getFirstFiftyWords();
+  }
+  @Post('/nextoffset')
+  getNextFiftyWords(@Body() page: OffsetDto) {
+    return this.translateService.getFiftyOffset(page);
+  }
+  // @Post('/nextfifty')
+  // getNextFiftyWords(@Body() cursor: CursorDto) {
+  //   return this.translateService.getNextFiftyWords(cursor);
+  // }
 
   @Post('/save')
   submitWord(@Body() createDoubleDto: CreateDoubleDto) {
@@ -41,6 +57,11 @@ export class TranslateController {
   ) {
     console.log(updateTranslateDto);
     return this.translateService.update(updateTranslateDto, id);
+  }
+
+  @Post('/ahead')
+  searchAhead(@Body() ahead: AheadDto) {
+    return this.translateService.searchAhead(ahead);
   }
 
   // @Delete(':id')

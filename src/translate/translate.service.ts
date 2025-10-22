@@ -8,6 +8,8 @@ import { Injectable } from '@nestjs/common';
 import {
   CreateTranslateDto,
   CreateDoubleDto,
+  OffsetDto,
+  AheadDto,
 } from './dto/create-translate.dto';
 import { firstValueFrom } from 'rxjs';
 import { PrismaService } from '../prisma.service';
@@ -23,6 +25,66 @@ export class TranslateService {
   getAllWords() {
     return this.prisma.words.findMany();
   }
+
+  async getFirstFiftyWords() {
+    const totalWords = await this.prisma.words.count();
+    const firstQueryResults = await this.prisma.words.findMany({
+      take: 50,
+      orderBy: {
+        id: 'asc',
+      },
+    });
+
+    const lastPostInResults = firstQueryResults[49];
+    const myCursor = lastPostInResults.original;
+    // const myCursor = lastPostInResults.id;
+    return { totalWords, firstQueryResults, myCursor, lastPostInResults };
+  }
+
+  async getFiftyOffset(pageNumber: OffsetDto) {
+    const totalWords = await this.prisma.words.count();
+    const { page } = pageNumber;
+    console.log('zoome!', page);
+
+    if (page < 0) {
+      const firstQueryResults = await this.prisma.words.findMany({
+        take: 50,
+        skip: totalWords + 50 * page,
+        orderBy: {
+          id: 'asc',
+        },
+      });
+      return { totalWords, firstQueryResults };
+    }
+    const firstQueryResults = await this.prisma.words.findMany({
+      take: 50,
+      skip: 50 * page,
+      orderBy: {
+        id: 'asc',
+      },
+    });
+
+    return { totalWords, firstQueryResults };
+  }
+  // async getNextFiftyWords(cursor: CursorDto) {
+  //   const totalWords = await this.prisma.words.count();
+  //   const { original } = cursor;
+  //   console.log('zoome!', original);
+  //   const firstQueryResults = await this.prisma.words.findMany({
+  //     take: 50,
+  //     skip: 1,
+  //     cursor: {
+  //       original: original,
+  //     },
+  //     orderBy: {
+  //       id: 'asc',
+  //     },
+  //   });
+
+  //   const lastPostInResults = firstQueryResults[49];
+  //   const myCursor = lastPostInResults.original;
+  //   return { totalWords, firstQueryResults, myCursor, lastPostInResults };
+  // }
 
   createLocalTranslation(createDoubleDto: CreateDoubleDto) {
     const translateSubmission = this.prisma.words.create({
@@ -51,6 +113,17 @@ export class TranslateService {
         id: id,
       },
       data: updateTranslateDto,
+    });
+  }
+
+  searchAhead(ahead: AheadDto) {
+    return this.prisma.words.findMany({
+      where: {
+        original: {
+          startsWith: ahead.ahead,
+        },
+      },
+      select: { original: true, id: true },
     });
   }
 
