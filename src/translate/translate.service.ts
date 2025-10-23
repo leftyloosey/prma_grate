@@ -22,8 +22,9 @@ export class TranslateService {
     private prisma: PrismaService,
   ) {}
 
-  getAllWords() {
-    return this.prisma.words.findMany();
+  async getAllWords() {
+    const all = await this.prisma.words.findMany();
+    return all;
   }
 
   async getFirstFiftyWords() {
@@ -86,8 +87,8 @@ export class TranslateService {
   //   return { totalWords, firstQueryResults, myCursor, lastPostInResults };
   // }
 
-  createLocalTranslation(createDoubleDto: CreateDoubleDto) {
-    const translateSubmission = this.prisma.words.create({
+  async createLocalTranslation(createDoubleDto: CreateDoubleDto) {
+    const translateSubmission = await this.prisma.words.create({
       data: {
         original: createDoubleDto.original,
         translation: createDoubleDto.translation,
@@ -101,23 +102,50 @@ export class TranslateService {
     return translateSubmission;
   }
 
-  getWordById(id: string) {
-    return this.prisma.words.findUnique({
+  async getWordById(id: string) {
+    const word = await this.prisma.words.findUnique({
       where: { id: id },
     });
+    return word;
   }
-  update(updateTranslateDto: UpdateTranslateDto, id: string) {
-    console.log(id);
-    return this.prisma.words.update({
+  async update(updateTranslateDto: UpdateTranslateDto, id: string) {
+    const update = await this.prisma.words.update({
       where: {
         id: id,
       },
       data: updateTranslateDto,
     });
+    return update;
+  }
+  async upsert(updateTranslateDto: UpdateTranslateDto) {
+    const word = await this.prisma.words.upsert({
+      where: {
+        original: updateTranslateDto.original,
+      },
+      update: {
+        original: updateTranslateDto.original,
+        translation: updateTranslateDto.translation,
+        partOfSpeech: updateTranslateDto.partOfSpeech,
+        definitions: updateTranslateDto.definitions,
+        examples: updateTranslateDto.examples,
+        case: updateTranslateDto.case,
+        timestamp: new Date(),
+      },
+      create: {
+        original: updateTranslateDto.original,
+        translation: updateTranslateDto.translation,
+        partOfSpeech: updateTranslateDto.partOfSpeech,
+        definitions: updateTranslateDto.definitions,
+        examples: updateTranslateDto.examples,
+        case: updateTranslateDto.case,
+        timestamp: new Date(),
+      },
+    });
+    return word;
   }
 
-  searchAhead(ahead: AheadDto) {
-    return this.prisma.words.findMany({
+  async searchAhead(ahead: AheadDto) {
+    const list = await this.prisma.words.findMany({
       where: {
         original: {
           startsWith: ahead.ahead,
@@ -125,6 +153,7 @@ export class TranslateService {
       },
       select: { original: true, id: true },
     });
+    return list;
   }
 
   async scrape(word: CreateTranslateDto): Promise<object> {

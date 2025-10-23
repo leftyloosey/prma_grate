@@ -39,6 +39,10 @@ export class TranslateController {
   submitWord(@Body() createDoubleDto: CreateDoubleDto) {
     return this.translateService.createLocalTranslation(createDoubleDto);
   }
+  @Post('/upsert')
+  upsertWord(@Body() upsertDoubleDto: UpdateTranslateDto) {
+    return this.translateService.upsert(upsertDoubleDto);
+  }
   @Post('/scrape')
   submitScrape(@Body() createTranslateDto: CreateTranslateDto) {
     return this.translateService.scrape(createTranslateDto);
