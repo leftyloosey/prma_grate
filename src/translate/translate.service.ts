@@ -118,6 +118,11 @@ export class TranslateService {
     return update;
   }
   async upsert(updateTranslateDto: UpdateTranslateDto) {
+    if (updateTranslateDto.id) {
+      const word = await this.update(updateTranslateDto, updateTranslateDto.id);
+      return word;
+    }
+
     const word = await this.prisma.words.upsert({
       where: {
         original: updateTranslateDto.original,
