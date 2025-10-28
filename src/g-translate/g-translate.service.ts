@@ -5,12 +5,20 @@ import { TranslationServiceClient } from '@google-cloud/translate';
 import { Translate } from '@google-cloud/translate/build/src/v2';
 import { CreateTranslateDto } from 'src/translate/dto/create-translate.dto';
 
+import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class GTranslateService {
+  protected api: any = '';
+  protected project: any = '';
   // create(createGTranslateDto: CreateGTranslateDto) {
   //   return 'This action adds a new gTranslate';
   // }
-
+  constructor(private configService: ConfigService) {
+    const api = this.configService.get<string>('GGL');
+    const project = this.configService.get<string>('PROJECT_ID');
+    this.api = api;
+    this.project = project;
+  }
   findAll() {
     return `This action returns all gTranslate`;
   }
@@ -57,12 +65,9 @@ export class GTranslateService {
   }
 
   gService2(word: CreateTranslateDto) {
-    const projectId = 'inductive-time-413806';
-    const apiKey = 'AIzaSyC0zTkwcKzG9r-sF6Xwtj3-WDgwSNDwdZ4';
-
     const translateClient = new Translate({
-      projectId: projectId,
-      key: apiKey,
+      projectId: this.project as string,
+      key: this.api as string,
     });
 
     async function translateText(text: string, targetLanguage: string) {
