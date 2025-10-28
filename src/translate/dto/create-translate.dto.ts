@@ -4,6 +4,9 @@ export class CreateTranslateDto {
   @IsNotEmpty()
   @IsString()
   text: string;
+  @IsNotEmpty()
+  @IsString()
+  tag: string;
 }
 export class CursorDto {
   @IsString()
@@ -12,6 +15,8 @@ export class CursorDto {
 export class OffsetDto {
   @IsNumber()
   page: number;
+  @IsString()
+  tag: string;
 }
 export class AheadDto {
   @IsString()
@@ -30,4 +35,6 @@ export class CreateDoubleDto {
   examples: string[];
   definitions: string[];
   case: string;
+  tag: string;
+  usersId: string;
 }

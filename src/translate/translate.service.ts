@@ -1,25 +1,24 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import {
-  CreateTranslateDto,
+  // CreateTranslateDto,
   CreateDoubleDto,
   OffsetDto,
   AheadDto,
 } from './dto/create-translate.dto';
-import { firstValueFrom } from 'rxjs';
+// import { firstValueFrom } from 'rxjs';
 import { PrismaService } from '../prisma.service';
 import { UpdateTranslateDto } from './dto/update-translate.dto';
+import { GTranslateService } from 'src/g-translate/g-translate.service';
+// import { ScrapeService } from './scrape/scrape.service';
 
 @Injectable()
 export class TranslateService {
   constructor(
     private readonly http: HttpService,
     private prisma: PrismaService,
+    private google: GTranslateService,
+    // private scrap: ScrapeService,
   ) {}
 
   async getAllWords() {
@@ -27,28 +26,50 @@ export class TranslateService {
     return all;
   }
 
-  async getFirstFiftyWords() {
+  // async getFirstFiftyWords() {
+  //   const totalWords = await this.prisma.words.count();
+  //   const firstQueryResults = await this.prisma.words.findMany({
+  //     take: 50,
+  //     orderBy: {
+  //       id: 'asc',
+  //     },
+  //   });
+
+  //   const lastPostInResults = firstQueryResults[49];
+  //   const myCursor = lastPostInResults.original;
+  //   // const myCursor = lastPostInResults.id;
+  //   return { totalWords, firstQueryResults, myCursor, lastPostInResults };
+  // }
+
+  async getFiftyOffset(pageAndTag: OffsetDto) {
     const totalWords = await this.prisma.words.count();
-    const firstQueryResults = await this.prisma.words.findMany({
-      take: 50,
-      orderBy: {
-        id: 'asc',
-      },
-    });
+    const { page } = pageAndTag;
+    const { tag } = pageAndTag;
 
-    const lastPostInResults = firstQueryResults[49];
-    const myCursor = lastPostInResults.original;
-    // const myCursor = lastPostInResults.id;
-    return { totalWords, firstQueryResults, myCursor, lastPostInResults };
-  }
+    // if (!tag) {
+    //   if (page < 0) {
+    //     const firstQueryResults = await this.prisma.words.findMany({
+    //       take: 50,
+    //       skip: totalWords + 50 * page,
+    //       orderBy: {
+    //         id: 'asc',
+    //       },
+    //     });
+    //     return { totalWords, firstQueryResults };
+    //   }
+    //   const firstQueryResults = await this.prisma.words.findMany({
+    //     take: 50,
+    //     skip: 50 * page,
+    //     orderBy: {
+    //       id: 'asc',
+    //     },
+    //   });
 
-  async getFiftyOffset(pageNumber: OffsetDto) {
-    const totalWords = await this.prisma.words.count();
-    const { page } = pageNumber;
-    console.log('zoome!', page);
-
+    //   return { totalWords, firstQueryResults };
+    // } else {
     if (page < 0) {
       const firstQueryResults = await this.prisma.words.findMany({
+        where: { tag: tag },
         take: 50,
         skip: totalWords + 50 * page,
         orderBy: {
@@ -58,6 +79,7 @@ export class TranslateService {
       return { totalWords, firstQueryResults };
     }
     const firstQueryResults = await this.prisma.words.findMany({
+      where: { tag: tag },
       take: 50,
       skip: 50 * page,
       orderBy: {
@@ -66,6 +88,7 @@ export class TranslateService {
     });
 
     return { totalWords, firstQueryResults };
+    // }
   }
   // async getNextFiftyWords(cursor: CursorDto) {
   //   const totalWords = await this.prisma.words.count();
@@ -96,6 +119,8 @@ export class TranslateService {
         definitions: createDoubleDto.definitions,
         examples: createDoubleDto.examples,
         case: createDoubleDto.case,
+        tag: createDoubleDto.tag,
+        usersId: createDoubleDto.usersId,
         timestamp: new Date(),
       },
     });
@@ -117,6 +142,20 @@ export class TranslateService {
     });
     return update;
   }
+  // async findAndUpdate() {
+  //   const updateUsers = await this.prisma.words.updateMany({
+  //     where: {
+  //       tag: {
+  //         equals: 'uk',
+  //       },
+  //     },
+  //     data: {
+  //       usersId: '689360ca43f25f4f5d6d9e24',
+  //     },
+  //   });
+  //   return updateUsers;
+  // }
+
   async upsert(updateTranslateDto: UpdateTranslateDto) {
     if (updateTranslateDto.id) {
       const word = await this.update(updateTranslateDto, updateTranslateDto.id);
@@ -143,6 +182,8 @@ export class TranslateService {
         definitions: updateTranslateDto.definitions,
         examples: updateTranslateDto.examples,
         case: updateTranslateDto.case,
+        tag: updateTranslateDto.tag,
+        usersId: updateTranslateDto.usersId,
         timestamp: new Date(),
       },
     });
@@ -161,51 +202,114 @@ export class TranslateService {
     return list;
   }
 
-  async scrape(word: CreateTranslateDto): Promise<object> {
-    const endpoint = 'https://en.wiktionary.org/api/rest_v1/page/definition';
-    const filter = new RegExp(
-      '< *\\/? *[a-z]+ *( [a-z]+="[^<>"]+" *)* *\\/? *>',
-      'ig',
-    );
-    const outArray: string[] = [];
-    const exmpArray: string[] = [];
-    const returnObj = {
-      partOfSpeech: '',
-      definitions: outArray,
-      examples: exmpArray,
-    };
-    const url = `${endpoint}/${word.text}`;
-    await firstValueFrom(this.http.get(url)).then((d) => {
-      const { data } = d;
+  // async scrape(word: CreateTranslateDto): Promise<object> {
+  //   console.log(word);
+  //   const endpoint = 'https://en.wiktionary.org/api/rest_v1/page/definition';
+  //   const filter = new RegExp(
+  //     '< *\\/? *[a-z]+ *( [a-z]+="[^<>"]+" *)* *\\/? *>',
+  //     'ig',
+  //   );
+  //   const outArray: string[] = [];
+  //   const exmpArray: string[] = [];
+  //   const returnObj = {
+  //     partOfSpeech: '',
+  //     definitions: outArray,
+  //     examples: exmpArray,
+  //   };
+  //   const url = `${endpoint}/${word.text}`;
+  //   let tag: string = 'uk';
+  //   if (word.tag) tag = word.tag;
 
-      function cleanString(str) {
-        return str.replaceAll(filter, '').replaceAll('&nbsp;', ' ');
-      }
+  //   try {
+  //     await firstValueFrom(this.http.get(url)).then((d) => {
+  //       const { data } = d;
 
-      for (const meaning of data.uk) {
-        returnObj.partOfSpeech = meaning.partOfSpeech;
-        for (const definition of meaning.definitions) {
-          if (definition.definition) {
-            const bob = definition.definition as string;
-            if (bob.includes('abbr title="perfective aspect"') === true)
-              console.log('perfect!!');
-            if (bob.includes('abbr title="imperfective aspect"') === true)
-              console.log('imperfect!!');
-            const filteredDefinition = cleanString(definition.definition);
-            outArray.push(filteredDefinition as string);
-            if (definition.examples) {
-              for (const example of definition.examples) {
-                const filteredExample = cleanString(example);
-                exmpArray.push(filteredExample as string);
-              }
-            }
-          }
-        }
+  //       function cleanString(str) {
+  //         return str.replaceAll(filter, '').replaceAll('&nbsp;', ' ');
+  //       }
 
-        console.log(returnObj);
-        return returnObj;
-      }
-    });
-    return returnObj;
-  }
+  //       for (const meaning of data[tag]) {
+  //         returnObj.partOfSpeech = meaning.partOfSpeech;
+  //         for (const definition of meaning.definitions) {
+  //           if (definition.definition) {
+  //             const bob = definition.definition as string;
+  //             if (bob.includes('abbr title="perfective aspect"') === true)
+  //               console.log('perfect!!');
+  //             if (bob.includes('abbr title="imperfective aspect"') === true)
+  //               console.log('imperfect!!');
+  //             const filteredDefinition = cleanString(definition.definition);
+  //             outArray.push(filteredDefinition as string);
+  //             if (definition.examples) {
+  //               for (const example of definition.examples) {
+  //                 const filteredExample = cleanString(example);
+  //                 exmpArray.push(filteredExample as string);
+  //               }
+  //             }
+  //           }
+  //         }
+
+  //         return returnObj;
+  //       }
+  //     });
+  //     // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  //   } catch (e) {
+  //     console.log('you had err');
+  //     const gey = this.google.gService2(word);
+  //     const hoo = await gey;
+  //     if (hoo) returnObj.definitions.push(hoo);
+  //   }
+
+  //   return returnObj;
+  // }
+  // async scrape(word: CreateTranslateDto): Promise<object> {
+  //   console.log(word);
+  //   const endpoint = 'https://en.wiktionary.org/api/rest_v1/page/definition';
+  //   const filter = new RegExp(
+  //     '< *\\/? *[a-z]+ *( [a-z]+="[^<>"]+" *)* *\\/? *>',
+  //     'ig',
+  //   );
+  //   const outArray: string[] = [];
+  //   const exmpArray: string[] = [];
+  //   const returnObj = {
+  //     partOfSpeech: '',
+  //     definitions: outArray,
+  //     examples: exmpArray,
+  //   };
+  //   const url = `${endpoint}/${word.text}`;
+  //   let tag: string = 'uk';
+  //   if (word.tag) tag = word.tag;
+  //   console.log(tag);
+  //   await firstValueFrom(this.http.get(url)).then((d) => {
+  //     const { data } = d;
+
+  //     function cleanString(str) {
+  //       return str.replaceAll(filter, '').replaceAll('&nbsp;', ' ');
+  //     }
+
+  //     for (const meaning of data[tag]) {
+  //       returnObj.partOfSpeech = meaning.partOfSpeech;
+  //       for (const definition of meaning.definitions) {
+  //         if (definition.definition) {
+  //           const bob = definition.definition as string;
+  //           if (bob.includes('abbr title="perfective aspect"') === true)
+  //             console.log('perfect!!');
+  //           if (bob.includes('abbr title="imperfective aspect"') === true)
+  //             console.log('imperfect!!');
+  //           const filteredDefinition = cleanString(definition.definition);
+  //           outArray.push(filteredDefinition as string);
+  //           if (definition.examples) {
+  //             for (const example of definition.examples) {
+  //               const filteredExample = cleanString(example);
+  //               exmpArray.push(filteredExample as string);
+  //             }
+  //           }
+  //         }
+  //       }
+
+  //       console.log(returnObj);
+  //       return returnObj;
+  //     }
+  //   });
+  //   return returnObj;
+  // }
 }

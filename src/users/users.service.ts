@@ -20,11 +20,11 @@ export class UsersService {
   getAllUsers() {
     return this.prisma.users.findMany();
   }
-  getUserComments(id: string) {
+  getUserWords(id: string) {
     return this.prisma.users.findUnique({
       where: { id: id },
       include: {
-        comments: true,
+        words: true,
       },
     });
   }

@@ -8,22 +8,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model comments {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
+// model comments {
+//   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  text     String
-  user     users   @relation(fields: [usersId], references: [id])
-  usersId  String  @db.ObjectId
-  parentId String? @db.ObjectId
+//   text     String
+//   user     users   @relation(fields: [usersId], references: [id])
+//   usersId  String  @db.ObjectId
+//   parentId String? @db.ObjectId
 
-  timestamp DateTime
-}
+//   timestamp DateTime
+// }
 
 model users {
-  id       String     @id @default(auto()) @map("_id") @db.ObjectId
-  name     String     @unique
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  name     String  @unique
   password String
-  comments comments[]
+  words    words[]
 }
 
 model words {
@@ -34,5 +34,8 @@ model words {
   examples     String[]
   definitions  String[]
   case         Json
+  tag          String
   timestamp    DateTime
+  users        users    @relation(fields: [usersId], references: [id])
+  usersId      String   @db.ObjectId
 }

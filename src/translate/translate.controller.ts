@@ -8,10 +8,15 @@ import {
 } from './dto/create-translate.dto';
 import { CreateDoubleDto } from './dto/create-translate.dto';
 import { UpdateTranslateDto } from './dto/update-translate.dto';
+import { ScraperService } from './scraper/scraper.service';
+// import { ScrapeService } from './scrape/scrape.service';
 
 @Controller('translate')
 export class TranslateController {
-  constructor(private readonly translateService: TranslateService) {}
+  constructor(
+    private readonly translateService: TranslateService,
+    private readonly scraper: ScraperService,
+  ) {}
 
   // @Post()
   // create(@Body() createTranslateDto: CreateTranslateDto) {
@@ -22,12 +27,13 @@ export class TranslateController {
   getAllWords() {
     return this.translateService.getAllWords();
   }
-  @Get('/firstfifty')
-  getFirstFiftyWords() {
-    return this.translateService.getFirstFiftyWords();
-  }
+  // @Get('/firstfifty')
+  // getFirstFiftyWords() {
+  //   return this.translateService.getFirstFiftyWords();
+  // }
   @Post('/nextoffset')
   getNextFiftyWords(@Body() page: OffsetDto) {
+    console.log('oy', page);
     return this.translateService.getFiftyOffset(page);
   }
   // @Post('/nextfifty')
@@ -45,14 +51,19 @@ export class TranslateController {
   }
   @Post('/scrape')
   submitScrape(@Body() createTranslateDto: CreateTranslateDto) {
-    return this.translateService.scrape(createTranslateDto);
-    // return this.translateService.submitWord(createTranslateDto);
+    return this.scraper.scrape(createTranslateDto);
+    // return this.translateService.scrape(createTranslateDto);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.translateService.getWordById(id);
   }
+  // @Patch()
+  // findOneAndUpdate() {
+  //   // findOneAndUpdate(@Param('id') id: string) {
+  //   return this.translateService.findAndUpdate();
+  // }
 
   @Patch(':id')
   update(

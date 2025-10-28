@@ -27,7 +27,7 @@ export class UsersController {
 
   @Get(':id')
   findOneUserComments(@Param('id') id: string) {
-    return this.usersService.getUserComments(id);
+    return this.usersService.getUserWords(id);
   }
 
   // @Patch(':id')

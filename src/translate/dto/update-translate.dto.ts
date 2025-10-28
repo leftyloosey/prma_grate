@@ -10,4 +10,6 @@ export class UpdateTranslateDto extends PartialType(CreateTranslateDto) {
   examples: string[];
   definitions: string[];
   case: string;
+  tag: string;
+  usersId: string;
 }
