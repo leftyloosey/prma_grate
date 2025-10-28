@@ -16,8 +16,7 @@ export class GTranslateService {
   constructor(private configService: ConfigService) {
     const api = this.configService.get<string>('GGL');
     const project = this.configService.get<string>('PROJECT_ID');
-    this.api = api;
-    this.project = project;
+    console.log(api, project);
   }
   findAll() {
     return `This action returns all gTranslate`;
@@ -37,7 +36,7 @@ export class GTranslateService {
   gService() {
     // Instantiates a client
     const translationClient = new TranslationServiceClient();
-    const projectId = 'inductive-time-413806';
+    const projectId = '';
     const location = 'global';
     const text = 'Hello, world!';
     async function translateText() {
@@ -65,9 +64,12 @@ export class GTranslateService {
   }
 
   gService2(word: CreateTranslateDto) {
+    const api = this.configService.get<string>('GGL');
+    const project = this.configService.get<string>('PROJECT_ID');
+
     const translateClient = new Translate({
-      projectId: this.project as string,
-      key: this.api as string,
+      projectId: project,
+      key: api,
     });
 
     async function translateText(text: string, targetLanguage: string) {

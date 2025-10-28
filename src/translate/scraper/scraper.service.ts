@@ -61,7 +61,7 @@ export class ScraperService {
               }
             }
           }
-
+          console.log(returnObj);
           return returnObj;
         }
       });
@@ -72,7 +72,7 @@ export class ScraperService {
       const hoo = await gey;
       if (hoo) returnObj.definitions.push(hoo);
     }
-
+    console.log(returnObj);
     return returnObj;
   }
 }
