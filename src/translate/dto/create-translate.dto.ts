@@ -7,6 +7,9 @@ export class CreateTranslateDto {
   @IsNotEmpty()
   @IsString()
   tag: string;
+  @IsNotEmpty()
+  @IsString()
+  target: string;
 }
 export class CursorDto {
   @IsString()

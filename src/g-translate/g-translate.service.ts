@@ -1,11 +1,15 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable } from '@nestjs/common';
 // import { CreateGTranslateDto } from './dto/create-g-translate.dto';
 // import { UpdateGTranslateDto } from './dto/update-g-translate.dto';
 import { TranslationServiceClient } from '@google-cloud/translate';
-import { Translate } from '@google-cloud/translate/build/src/v2';
+// import { Translate } from '@google-cloud/translate/build/src/v2';
 import { CreateTranslateDto } from 'src/translate/dto/create-translate.dto';
-
 import { ConfigService } from '@nestjs/config';
+import * as translate from 'extended-google-translate-api';
 @Injectable()
 export class GTranslateService {
   protected api: any = '';
@@ -64,40 +68,57 @@ export class GTranslateService {
   }
 
   gService2(word: CreateTranslateDto) {
-    const api = this.configService.get<string>('GGL');
-    const project = this.configService.get<string>('PROJECT_ID');
+    // const api = this.configService.get<string>('GGL');
+    // const project = this.configService.get<string>('PROJECT_ID');
 
-    const translateClient = new Translate({
-      projectId: project,
-      key: api,
-    });
+    // const translateClient = new Translate({
+    //   projectId: project,
+    //   key: api,
+    // });
 
-    async function translateText(text: string, targetLanguage: string) {
-      try {
-        const [translation] = await translateClient.translate(
-          text,
-          targetLanguage,
-          // text,
-          // { format: '', from: '', model: '', to: '' },
-        );
-        console.log(`Text: ${text}`);
-        console.log(`Translation to ${targetLanguage}: ${translation}`);
-        return translation;
-      } catch (error) {
-        console.error('Translation error:', error);
-        throw error;
-      }
-    }
+    // async function translateText(text: string, targetLanguage: string) {
+    //   try {
+    //     const [translation] = await translateClient.translate(
+    //       text,
+    //       targetLanguage,
+    //       // text,
+    //       // { format: '', from: '', model: '', to: '' },
+    //     );
+    //     console.log(`Text: ${text}`);
+    //     console.log(`Translation to ${targetLanguage}: ${translation}`);
+    //     return translation;
+    //   } catch (error) {
+    //     console.error('Translation error:', error);
+    //     throw error;
+    //   }
+    // }
+    translate.defaultDataOptions.definitionSynonyms = true;
+    translate.defaultDataOptions.detailedTranslationsSynonyms = true;
+    translate.defaultDataOptions.definitionExamples = true;
+    translate.defaultDataOptions.examples = true;
+    translate.defaultDataOptions.detailedTranslations = true;
 
-    // Example usage:
-
-    const bob = translateText(word.text, 'en')
-      // translateText('Hello, world!', 'uk')
-      .then((translatedText) => {
-        return translatedText;
+    const bob = translate(word.text, word.tag, word.target, {
+      // const bob = translate(word.text, 'uk', 'de', {
+      definitionSynonyms: true,
+      detailedTranslationsSynonyms: true,
+      definitionExamples: true,
+      examples: true,
+      detailedTranslations: true,
+    })
+      .then((res) => {
+        console.log(res.translation);
+        return res;
+        // console.log(JSON.stringify(res, undefined, 2));
       })
-      // .then((translatedText) => console.log('Translated text:', translatedText))
-      .catch((error) => console.error('Error during translation:', error));
+      .catch(console.log);
+
+    // const bob = translateText(word.text, 'en')
+    //   .then((translatedText) => {
+    //     return translatedText;
+    //   })
+
+    //   .catch((error) => console.error('Error during translation:', error));
     return bob;
   }
   //   translateText('Hello, world!', 'uk')

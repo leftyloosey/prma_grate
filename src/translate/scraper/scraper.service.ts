@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
@@ -16,8 +17,14 @@ export class ScraperService {
     private prisma: PrismaService,
     private google: GTranslateService,
   ) {}
-  async scrape(word: CreateTranslateDto): Promise<object> {
-    console.log(word);
+  private async toGoogle(word: CreateTranslateDto) {
+    const gey = this.google.gService2(word);
+
+    const hoo = await gey;
+
+    return hoo;
+  }
+  public async scrape(word: CreateTranslateDto): Promise<object> {
     const endpoint = 'https://en.wiktionary.org/api/rest_v1/page/definition';
     const filter = new RegExp(
       '< *\\/? *[a-z]+ *( [a-z]+="[^<>"]+" *)* *\\/? *>',
@@ -31,6 +38,14 @@ export class ScraperService {
       examples: exmpArray,
     };
     const url = `${endpoint}/${word.text}`;
+    if (word.target !== 'en') {
+      const fromGoogle = await this.toGoogle(word);
+
+      if (fromGoogle) returnObj.definitions.push(fromGoogle.translation);
+      console.log(returnObj);
+      return returnObj;
+    }
+
     let tag: string = 'uk';
     if (word.tag) tag = word.tag;
 
@@ -67,10 +82,9 @@ export class ScraperService {
       });
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
-      console.log('you had err');
-      const gey = this.google.gService2(word);
-      const hoo = await gey;
-      if (hoo) returnObj.definitions.push(hoo);
+      const fromGoogle = await this.toGoogle(word);
+
+      if (fromGoogle) returnObj.definitions.push(fromGoogle.translation);
     }
     console.log(returnObj);
     return returnObj;
