@@ -1,3 +1,14 @@
+export class scrapeReturnObj {
+  partOfSpeech: string;
+  definitions: string[];
+  examples: string[];
+  constructor(partOfSpeech: string, definitions: string[], examples: string[]) {
+    this.partOfSpeech = partOfSpeech;
+    this.examples = examples;
+    this.definitions = definitions;
+  }
+}
+
 export function cleanString(str: string) {
   const filter = new RegExp(
     '< *\\/? *[a-z]+ *( [a-z]+="[^<>"]+" *)* *\\/? *>',

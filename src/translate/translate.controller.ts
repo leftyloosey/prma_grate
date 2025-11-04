@@ -31,7 +31,6 @@ export class TranslateController {
 
   @Post('/nextoffset')
   getNextFiftyWords(@Body() page: OffsetDto) {
-    console.log('oy', page);
     return this.translateService.getFiftyOffset(page);
   }
 
