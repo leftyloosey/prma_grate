@@ -4,6 +4,7 @@ import {
   CreateDoubleDto,
   OffsetDto,
   AheadDto,
+  LangTagDto,
 } from './dto/create-translate.dto';
 import { PrismaService } from '../prisma.service';
 import { UpdateTranslateDto } from './dto/update-translate.dto';
@@ -22,31 +23,39 @@ export class TranslateService {
     return all;
   }
 
+  async getWordsByLanguageTag(tag: LangTagDto) {
+    const all = await this.prisma.words.findMany({ where: { tag: tag.tag } });
+    return all;
+  }
+
   async getFiftyOffset(pageAndTag: OffsetDto) {
-    const totalWords = await this.prisma.words.count();
     const { page } = pageAndTag;
     const { tag } = pageAndTag;
+    const totalWords = await this.prisma.words.count({ where: { tag } });
+
+    const searchSize = 25;
 
     if (page < 0) {
       const firstQueryResults = await this.prisma.words.findMany({
         where: { tag: tag },
-        take: 50,
-        skip: totalWords + 50 * page,
+        take: searchSize,
+        skip: totalWords + searchSize * page,
         orderBy: {
           id: 'asc',
         },
       });
+      console.log(totalWords, firstQueryResults);
       return { totalWords, firstQueryResults };
     }
     const firstQueryResults = await this.prisma.words.findMany({
       where: { tag: tag },
-      take: 50,
-      skip: 50 * page,
+      take: searchSize,
+      skip: searchSize * page,
       orderBy: {
         id: 'asc',
       },
     });
-
+    console.log(totalWords, firstQueryResults);
     return { totalWords, firstQueryResults };
   }
 
@@ -127,15 +136,23 @@ export class TranslateService {
   }
 
   async searchAhead(ahead: AheadDto) {
-    const list = await this.prisma.words.findMany({
-      where: {
-        original: {
-          startsWith: ahead.ahead,
+    try {
+      const list = await this.prisma.words.findMany({
+        where: {
+          original: {
+            startsWith: ahead.ahead,
+          },
         },
-      },
-      select: { original: true, id: true },
-    });
-    return list;
+        select: { original: true, id: true },
+      });
+      return list;
+    } catch {
+      const list = {
+        id: '',
+        original: '',
+      };
+      return list;
+    }
   }
 
   // async getNextFiftyWords(cursor: CursorDto) {

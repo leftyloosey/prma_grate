@@ -2,10 +2,17 @@ export class scrapeReturnObj {
   partOfSpeech: string;
   definitions: string[];
   examples: string[];
-  constructor(partOfSpeech: string, definitions: string[], examples: string[]) {
+  tag: string;
+  constructor(
+    partOfSpeech: string,
+    definitions: string[],
+    examples: string[],
+    tag: string,
+  ) {
     this.partOfSpeech = partOfSpeech;
     this.examples = examples;
     this.definitions = definitions;
+    this.tag = tag;
   }
 }
 
@@ -44,6 +51,7 @@ export interface wikiObjReturn {
   partOfSpeech: string;
   definitions: string[];
   examples: string[];
+  tag: string;
 }
 export function parseWiki(data: wikiReturn, tag: string): wikiObjReturn {
   let meaning: meaningReturn;
@@ -54,8 +62,9 @@ export function parseWiki(data: wikiReturn, tag: string): wikiObjReturn {
     partOfSpeech: '',
     definitions: outArray,
     examples: exmpArray,
+    tag: tag,
   };
-
+  console.log('tag inside parsewiki', tag);
   for (meaning of data[tag]) {
     returnObj.partOfSpeech = meaning.partOfSpeech;
     for (definition of meaning.definitions) {

@@ -11,6 +11,7 @@ import { TranslateService } from './translate.service';
 import {
   AheadDto,
   CreateTranslateDto,
+  LangTagDto,
   OffsetDto,
 } from './dto/create-translate.dto';
 // import { CreateDoubleDto } from './dto/create-translate.dto';
@@ -27,6 +28,11 @@ export class TranslateController {
   @Get()
   getAllWords() {
     return this.translateService.getAllWords();
+  }
+
+  @Post('/wordsbytag')
+  getWordsByLanguageTag(@Body() tag: LangTagDto) {
+    return this.translateService.getWordsByLanguageTag(tag);
   }
 
   @Post('/nextoffset')

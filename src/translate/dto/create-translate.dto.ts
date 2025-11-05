@@ -11,16 +11,22 @@ export class CreateTranslateDto {
   @IsString()
   target: string;
 }
-export class CursorDto {
-  @IsString()
-  original: string;
-}
+// export class CursorDto {
+//   @IsString()
+//   original: string;
+// }
 export class OffsetDto {
   @IsNumber()
   page: number;
   @IsString()
   tag: string;
 }
+export class LangTagDto {
+  @IsNotEmpty()
+  @IsString()
+  tag: string;
+}
+
 export class AheadDto {
   @IsString()
   ahead: string;

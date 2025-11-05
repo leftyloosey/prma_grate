@@ -17,7 +17,7 @@ export class GTranslateController {
   constructor(private readonly gTranslateService: GTranslateService) {}
 
   @Post('/single')
-  getNextFiftyWords(@Body() submit: CreateTranslateDto) {
+  getSingleGoogle(@Body() submit: CreateTranslateDto) {
     return this.gTranslateService.gService2(submit);
   }
   // @Post()
