@@ -20,6 +20,8 @@ export class OffsetDto {
   page: number;
   @IsString()
   tag: string;
+  @IsString()
+  usersId: string;
 }
 export class LangTagDto {
   @IsNotEmpty()

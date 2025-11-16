@@ -29,33 +29,33 @@ export class TranslateService {
   }
 
   async getFiftyOffset(pageAndTag: OffsetDto) {
-    const { page } = pageAndTag;
-    const { tag } = pageAndTag;
-    const totalWords = await this.prisma.words.count({ where: { tag } });
+    const { page, tag, usersId } = pageAndTag;
+    console.log(page, tag, usersId);
+    const totalWords = await this.prisma.words.count({
+      where: { tag, usersId },
+    });
 
     const searchSize = 25;
 
     if (page < 0) {
       const firstQueryResults = await this.prisma.words.findMany({
-        where: { tag: tag },
+        where: { tag, usersId },
         take: searchSize,
         skip: totalWords + searchSize * page,
         orderBy: {
           id: 'asc',
         },
       });
-      console.log(totalWords, firstQueryResults);
       return { totalWords, firstQueryResults };
     }
     const firstQueryResults = await this.prisma.words.findMany({
-      where: { tag: tag },
+      where: { tag, usersId },
       take: searchSize,
       skip: searchSize * page,
       orderBy: {
         id: 'asc',
       },
     });
-    console.log(totalWords, firstQueryResults);
     return { totalWords, firstQueryResults };
   }
 

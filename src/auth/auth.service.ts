@@ -9,9 +9,9 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signIn(name: string, password: string): Promise<any> {
-    const user = await this.usersService.getUserForAuth(name, password);
-    if (user?.password !== password) {
+  async signIn(username: string, password: string): Promise<any> {
+    const user = await this.usersService.getUserForAuth(username, password);
+    if (!user) {
       throw new UnauthorizedException();
     }
     const payload = { userId: user.id, userName: user.name };
@@ -19,4 +19,14 @@ export class AuthService {
       access_token: await this.jwtService.signAsync(payload),
     };
   }
+  // async signIn(username: string, password: string): Promise<any> {
+  //   const user = await this.usersService.getUserForAuth(username, password);
+  //   if (user?.password !== password) {
+  //     throw new UnauthorizedException();
+  //   }
+  //   const payload = { userId: user.id, userName: user.name };
+  //   return {
+  //     access_token: await this.jwtService.signAsync(payload),
+  //   };
+  // }
 }
